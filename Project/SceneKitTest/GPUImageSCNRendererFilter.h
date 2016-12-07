@@ -8,12 +8,12 @@
 
 #import <GPUImage/GPUImage.h>
 
-extern NSString *const kGPUImageLuminanceFragmentShaderString;
-
-@class SCNView;
+@class SCNScene, SCNRenderer;
 
 @interface GPUImageSCNRendererFilter : GPUImageFilter
 
-- (instancetype)initWithSceneView:(SCNScene *)_scene context:(EAGLContext *)_context;
+@property (strong, nonatomic) SCNRenderer *renderer;
+
+- (instancetype)initWithScene:(SCNScene *)scene context:(EAGLContext *)context;
 
 @end

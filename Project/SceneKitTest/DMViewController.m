@@ -10,16 +10,15 @@
 #import <Photos/Photos.h>
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "GPUImageSCNRendererFilter.h"
-#import "DMSceneView.h"
 
-@interface DMViewController () <SCNSceneRendererDelegate, GPUImageVideoCameraDelegate>
+@interface DMViewController () <GPUImageVideoCameraDelegate>
 
 @property (weak, nonatomic) IBOutlet GPUImageView *cameraView;
-@property (nonatomic) DMSceneView *scene;
-@property (weak, nonatomic) IBOutlet SCNView *sceneView;
 
 @property (strong, nonatomic) GPUImageVideoCamera *camera;
 @property (strong, nonatomic) GPUImageSCNRendererFilter *filter;
+@property (strong, nonatomic) GPUImageMovieWriter *writer;
+@property (strong, nonatomic) SCNScene *scene;
 
 @property (strong, nonatomic) NSURL *cameraVideoOuputURL;
 
@@ -36,44 +35,14 @@
     self.camera.horizontallyMirrorRearFacingCamera = NO;
     self.camera.delegate = self;
     
-    self.scene = [[DMSceneView alloc] initWithFrame:self.view.bounds scene:[SCNScene sceneNamed:@"Objects.scnassets/main.scn"] context:[GPUImageContext sharedImageProcessingContext].context];
-    GPUImageUIElement *element = [[GPUImageUIElement alloc] initWithView:self.scene];
+    self.scene = [SCNScene sceneNamed:@"Objects.scnassets/main.scn"];
+    self.filter = [[GPUImageSCNRendererFilter alloc] initWithScene:self.scene context:[GPUImageContext sharedImageProcessingContext].context];
+    [self.camera addTarget:self.filter];
+    [self.filter addTarget:self.cameraView];
     
-    GPUImageSepiaFilter *sepia = [[GPUImageSepiaFilter alloc] init];
-    GPUImageAlphaBlendFilter *blend = [[GPUImageAlphaBlendFilter alloc] init];
-    blend.mix = 1;
-    
-    [self.camera addTarget:sepia];
-    [sepia addTarget:blend];
-    [element addTarget:blend];
-    
-    __weak typeof(self) welf = self;
-    [sepia addTarget:self.cameraView];
-    [sepia setFrameProcessingCompletionBlock:^(GPUImageOutput *output, CMTime time) {
-        [welf.scene renderFrame];
-        [element update];
-    }];
-    
-//    self.sceneView.scene = [SCNScene sceneNamed:@"Objects.scnassets/main.scn"];
-//    self.sceneView.allowsCameraControl = NO;
-//    self.sceneView.showsStatistics = YES;
-//    self.sceneView.backgroundColor = [UIColor clearColor];
-//    self.sceneView.delegate = self;
-    
-//    self.filter = [[GPUImageSCNRendererFilter alloc] initWithSceneView:self.sceneView];
-//    
-//    [self.camera addTarget:self.filter];
-//    [self.filter addTarget:self.cameraView];
-    
-    SCNNode *n = [self.scene.scene.rootNode childNodeWithName:@"coin" recursively:YES];
-    [n runAction:[SCNAction repeatActionForever:[SCNAction rotateByX:0 y:10 z:0 duration:0.3]]];
-    
-    
-    
-    
-    
-//    CADisplayLink *d = [CADisplayLink displayLinkWithTarget:self.scene selector:@selector(renderFrame)];
-//    [d addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+    self.writer = [[GPUImageMovieWriter alloc] initWithMovieURL:self.cameraVideoOuputURL size:self.view.bounds.size];
+    self.writer.encodingLiveVideo = true;
+    [self.filter addTarget:self.writer];
     
     UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
     NSMutableArray *gestures = [NSMutableArray array];
@@ -113,11 +82,25 @@
 }
 
 - (void)startRecording {
-
+    NSFileManager *manager = [NSFileManager defaultManager];
+    NSError *error = nil;
+    [manager removeItemAtPath:self.cameraVideoOuputURL.absoluteString error:&error];
+    
+    [self.writer startRecording];
 }
 
 - (void)stopRecording {
-
+    __weak typeof(self) welf = self;
+    [self.writer finishRecordingWithCompletionHandler:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [welf requestLibraryAccess:^{
+                ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+                [library writeVideoAtPathToSavedPhotosAlbum:self.cameraVideoOuputURL completionBlock:^(NSURL *assetURL, NSError *error){
+                    NSLog(@"AHTUUUUUUNG!!!!!");
+                }];
+            }];
+        });
+    }];
 }
 
 
@@ -132,29 +115,15 @@
 }
 
 - (void)handlePanGesture:(UIPanGestureRecognizer *)gestureRecognizer {
-    CGPoint point = [gestureRecognizer locationInView:self.sceneView];
-    NSArray *results = [self.sceneView hitTest:point options:nil];
-    
-    if (results.count > 0) {
-        SCNHitTestResult *result = [results objectAtIndex:0];
-        SCNNode *node = result.node;
-        if ([node.name isEqualToString:@"coin"]) {
-            if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
-                [node.physicsBody applyTorque:SCNVector4Make(0, -node.physicsBody.angularVelocity.y, 0, -node.physicsBody.angularVelocity.w) impulse:YES];
-            } else {
-                CGPoint translation = [gestureRecognizer translationInView:self.view];
-                CGFloat angle = translation.x * (M_PI)/180.0;
-                
-                [node.physicsBody applyTorque:SCNVector4Make(0, 10000, 0, angle) impulse:YES];
-            }
-        }
+    SCNNode *node = [self.scene.rootNode childNodeWithName:@"coin" recursively:YES];
+    if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
+        [node.physicsBody applyTorque:SCNVector4Make(0, -node.physicsBody.angularVelocity.y, 0, -node.physicsBody.angularVelocity.w) impulse:YES];
+    } else {
+        CGPoint translation = [gestureRecognizer translationInView:self.view];
+        CGFloat angle = translation.x * (M_PI)/180.0;
+        
+        [node.physicsBody applyTorque:SCNVector4Make(0, 10000, 0, angle) impulse:YES];
     }
-}
-
-#pragma mark - SCNSceneRendererDelegate
-
-- (void)renderer:(id<SCNSceneRenderer>)renderer didRenderScene:(SCNScene *)scene atTime:(NSTimeInterval)time {
-    
 }
 
 #pragma mark - GPUImageVideoCameraDelegate
