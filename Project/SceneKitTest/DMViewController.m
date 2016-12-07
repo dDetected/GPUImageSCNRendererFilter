@@ -10,19 +10,18 @@
 #import <Photos/Photos.h>
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "GPUImageSCNRendererFilter.h"
+#import "DMSceneView.h"
 
 @interface DMViewController () <SCNSceneRendererDelegate, GPUImageVideoCameraDelegate>
 
 @property (weak, nonatomic) IBOutlet GPUImageView *cameraView;
+@property (nonatomic) DMSceneView *scene;
 @property (weak, nonatomic) IBOutlet SCNView *sceneView;
 
 @property (strong, nonatomic) GPUImageVideoCamera *camera;
-@property (strong, nonatomic) GPUImageAlphaBlendFilter *blender;
-@property (strong, nonatomic) GPUImageUIElement *element;
+@property (strong, nonatomic) GPUImageSCNRendererFilter *filter;
 
 @property (strong, nonatomic) NSURL *cameraVideoOuputURL;
-
-@property (strong, nonatomic) UIImageView *fake;
 
 @end
 
@@ -37,44 +36,50 @@
     self.camera.horizontallyMirrorRearFacingCamera = NO;
     self.camera.delegate = self;
     
-    self.sceneView.scene = [SCNScene sceneNamed:@"Objects.scnassets/main.scn"];
-    self.sceneView.allowsCameraControl = NO;
-    self.sceneView.showsStatistics = YES;
-    self.sceneView.backgroundColor = [UIColor clearColor];
-    self.sceneView.delegate = self;
+    self.scene = [[DMSceneView alloc] initWithFrame:self.view.bounds scene:[SCNScene sceneNamed:@"Objects.scnassets/main.scn"] context:[GPUImageContext sharedImageProcessingContext].context];
+    GPUImageUIElement *element = [[GPUImageUIElement alloc] initWithView:self.scene];
     
-    GPUImageSepiaFilter *filter = [[GPUImageSepiaFilter alloc] init];
-    [self.camera addTarget:filter];
+    GPUImageSepiaFilter *sepia = [[GPUImageSepiaFilter alloc] init];
+    GPUImageAlphaBlendFilter *blend = [[GPUImageAlphaBlendFilter alloc] init];
+    blend.mix = 1;
     
-    self.blender = [[GPUImageAlphaBlendFilter alloc] init];
-    self.blender.mix = 1;
-    self.element = [[GPUImageUIElement alloc] initWithView:self.fake];
-    
-    [filter addTarget:self.blender];
-    [self.element addTarget:self.blender];
-    [self.blender addTarget:self.cameraView];
+    [self.camera addTarget:sepia];
+    [sepia addTarget:blend];
+    [element addTarget:blend];
     
     __weak typeof(self) welf = self;
-    [filter setFrameProcessingCompletionBlock:^(GPUImageOutput *input, CMTime time) {
-        UIImageView *v = self.fake;
-        [welf.element setValue:v forKey:@"view"];
-        [welf.element setValue:v.layer forKey:@"layer"];
-        [welf.element update];
+    [sepia addTarget:self.cameraView];
+    [sepia setFrameProcessingCompletionBlock:^(GPUImageOutput *output, CMTime time) {
+        [welf.scene renderFrame];
+        [element update];
     }];
     
+//    self.sceneView.scene = [SCNScene sceneNamed:@"Objects.scnassets/main.scn"];
+//    self.sceneView.allowsCameraControl = NO;
+//    self.sceneView.showsStatistics = YES;
+//    self.sceneView.backgroundColor = [UIColor clearColor];
+//    self.sceneView.delegate = self;
     
-    SCNNode *n = [self.sceneView.scene.rootNode childNodeWithName:@"coin" recursively:YES];
+//    self.filter = [[GPUImageSCNRendererFilter alloc] initWithSceneView:self.sceneView];
+//    
+//    [self.camera addTarget:self.filter];
+//    [self.filter addTarget:self.cameraView];
+    
+    SCNNode *n = [self.scene.scene.rootNode childNodeWithName:@"coin" recursively:YES];
     [n runAction:[SCNAction repeatActionForever:[SCNAction rotateByX:0 y:10 z:0 duration:0.3]]];
     
-    UIPanGestureRecognizer *tapGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
-    NSMutableArray *gestureRecognizers = [NSMutableArray array];
-    [gestureRecognizers addObject:tapGesture];
-    [gestureRecognizers addObjectsFromArray:self.view.gestureRecognizers];
-    self.view.gestureRecognizers = gestureRecognizers;
-}
-
-- (UIImageView *)fake {
-    return [[UIImageView alloc] initWithImage:self.sceneView.snapshot];
+    
+    
+    
+    
+//    CADisplayLink *d = [CADisplayLink displayLinkWithTarget:self.scene selector:@selector(renderFrame)];
+//    [d addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+    
+    UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
+    NSMutableArray *gestures = [NSMutableArray array];
+    [gestures addObject:pan];
+    [gestures addObjectsFromArray:self.view.gestureRecognizers];
+    self.view.gestureRecognizers = gestures;
 }
 
 - (void)viewWillAppear:(BOOL)animated {

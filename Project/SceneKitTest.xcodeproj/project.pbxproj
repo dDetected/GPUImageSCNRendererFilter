@@ -8,9 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		A01585B81DF6D6B200382388 /* Objects.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = A01585B71DF6D6B200382388 /* Objects.scnassets */; };
-		A01585C01DF70FF000382388 /* Glimpse.m in Sources */ = {isa = PBXBuildFile; fileRef = A01585BD1DF70FF000382388 /* Glimpse.m */; };
-		A01585C11DF70FF000382388 /* GlimpseAssetWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = A01585BF1DF70FF000382388 /* GlimpseAssetWriter.m */; };
 		A01585C41DF8215200382388 /* GPUImageSCNRendererFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = A01585C31DF8215200382388 /* GPUImageSCNRendererFilter.m */; };
+		A01585C71DF8568900382388 /* DMSceneView.m in Sources */ = {isa = PBXBuildFile; fileRef = A01585C61DF8568900382388 /* DMSceneView.m */; };
 		A0E1E7371DF599A4003E3F07 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A0E1E7361DF599A4003E3F07 /* main.m */; };
 		A0E1E73A1DF599A4003E3F07 /* DMAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A0E1E7391DF599A4003E3F07 /* DMAppDelegate.m */; };
 		A0E1E73F1DF599A4003E3F07 /* DMViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A0E1E73E1DF599A4003E3F07 /* DMViewController.m */; };
@@ -24,13 +23,10 @@
 		49928EA67E8DA9C853FC064F /* Pods-SceneKitTest.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SceneKitTest.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-SceneKitTest/Pods-SceneKitTest.debug.xcconfig"; sourceTree = "<group>"; };
 		8A556D6E78EFE23096B5D33C /* Pods_SceneKitTest.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SceneKitTest.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A01585B71DF6D6B200382388 /* Objects.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = Objects.scnassets; sourceTree = "<group>"; };
-		A01585BB1DF70FF000382388 /* Glimpse-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Glimpse-Prefix.pch"; sourceTree = "<group>"; };
-		A01585BC1DF70FF000382388 /* Glimpse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Glimpse.h; sourceTree = "<group>"; };
-		A01585BD1DF70FF000382388 /* Glimpse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Glimpse.m; sourceTree = "<group>"; };
-		A01585BE1DF70FF000382388 /* GlimpseAssetWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GlimpseAssetWriter.h; sourceTree = "<group>"; };
-		A01585BF1DF70FF000382388 /* GlimpseAssetWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GlimpseAssetWriter.m; sourceTree = "<group>"; };
 		A01585C21DF8215200382388 /* GPUImageSCNRendererFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GPUImageSCNRendererFilter.h; sourceTree = "<group>"; };
 		A01585C31DF8215200382388 /* GPUImageSCNRendererFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GPUImageSCNRendererFilter.m; sourceTree = "<group>"; };
+		A01585C51DF8568900382388 /* DMSceneView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DMSceneView.h; sourceTree = "<group>"; };
+		A01585C61DF8568900382388 /* DMSceneView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DMSceneView.m; sourceTree = "<group>"; };
 		A0E1E7321DF599A4003E3F07 /* SceneKitTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SceneKitTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A0E1E7361DF599A4003E3F07 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		A0E1E7381DF599A4003E3F07 /* DMAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DMAppDelegate.h; sourceTree = "<group>"; };
@@ -83,26 +79,6 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
-		A01585B91DF70FE300382388 /* 3D */ = {
-			isa = PBXGroup;
-			children = (
-				A01585BA1DF70FF000382388 /* Glimpse */,
-			);
-			name = 3D;
-			sourceTree = "<group>";
-		};
-		A01585BA1DF70FF000382388 /* Glimpse */ = {
-			isa = PBXGroup;
-			children = (
-				A01585BB1DF70FF000382388 /* Glimpse-Prefix.pch */,
-				A01585BC1DF70FF000382388 /* Glimpse.h */,
-				A01585BD1DF70FF000382388 /* Glimpse.m */,
-				A01585BE1DF70FF000382388 /* GlimpseAssetWriter.h */,
-				A01585BF1DF70FF000382388 /* GlimpseAssetWriter.m */,
-			);
-			path = Glimpse;
-			sourceTree = "<group>";
-		};
 		A0E1E7291DF599A4003E3F07 = {
 			isa = PBXGroup;
 			children = (
@@ -124,7 +100,6 @@
 		A0E1E7341DF599A4003E3F07 /* SceneKitTest */ = {
 			isa = PBXGroup;
 			children = (
-				A01585B91DF70FE300382388 /* 3D */,
 				A01585AD1DF6CA0200382388 /* Resources */,
 				A0E1E7381DF599A4003E3F07 /* DMAppDelegate.h */,
 				A0E1E7391DF599A4003E3F07 /* DMAppDelegate.m */,
@@ -132,6 +107,8 @@
 				A0E1E73E1DF599A4003E3F07 /* DMViewController.m */,
 				A01585C21DF8215200382388 /* GPUImageSCNRendererFilter.h */,
 				A01585C31DF8215200382388 /* GPUImageSCNRendererFilter.m */,
+				A01585C51DF8568900382388 /* DMSceneView.h */,
+				A01585C61DF8568900382388 /* DMSceneView.m */,
 				A0E1E7401DF599A4003E3F07 /* Main.storyboard */,
 				A0E1E7481DF599A4003E3F07 /* Info.plist */,
 				A0E1E7361DF599A4003E3F07 /* main.m */,
@@ -263,10 +240,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A01585C11DF70FF000382388 /* GlimpseAssetWriter.m in Sources */,
 				A0E1E73A1DF599A4003E3F07 /* DMAppDelegate.m in Sources */,
-				A01585C01DF70FF000382388 /* Glimpse.m in Sources */,
 				A0E1E73F1DF599A4003E3F07 /* DMViewController.m in Sources */,
+				A01585C71DF8568900382388 /* DMSceneView.m in Sources */,
 				A01585C41DF8215200382388 /* GPUImageSCNRendererFilter.m in Sources */,
 				A0E1E7371DF599A4003E3F07 /* main.m in Sources */,
 			);
