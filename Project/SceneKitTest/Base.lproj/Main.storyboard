@@ -21,6 +21,9 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
+                            <sceneKitView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PJs-5b-Kuj">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                            </sceneKitView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hZ9-TR-5sf" customClass="GPUImageView">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -43,22 +46,27 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="oYG-A3-Mxr" firstAttribute="centerX" secondItem="hZ9-TR-5sf" secondAttribute="centerX" id="AIi-Qc-XCg"/>
+                            <constraint firstAttribute="trailing" secondItem="PJs-5b-Kuj" secondAttribute="trailing" id="B6a-0M-ea5"/>
+                            <constraint firstItem="Oyk-wC-s6D" firstAttribute="top" secondItem="PJs-5b-Kuj" secondAttribute="bottom" id="GQg-yX-9Pl"/>
                             <constraint firstItem="Oyk-wC-s6D" firstAttribute="top" secondItem="sh2-dt-0Cz" secondAttribute="bottom" constant="20" id="Kzd-Yv-dRR"/>
                             <constraint firstItem="sh2-dt-0Cz" firstAttribute="top" secondItem="oYG-A3-Mxr" secondAttribute="bottom" constant="8" id="Q8z-MU-rFK"/>
                             <constraint firstItem="sh2-dt-0Cz" firstAttribute="centerX" secondItem="hZ9-TR-5sf" secondAttribute="centerX" id="QRU-Gw-B6f"/>
                             <constraint firstAttribute="trailing" secondItem="hZ9-TR-5sf" secondAttribute="trailing" id="Qc2-rj-C0M"/>
+                            <constraint firstItem="PJs-5b-Kuj" firstAttribute="top" secondItem="5rq-ka-Tbb" secondAttribute="top" id="Udn-lK-85z"/>
+                            <constraint firstItem="PJs-5b-Kuj" firstAttribute="leading" secondItem="5rq-ka-Tbb" secondAttribute="leading" id="eWJ-4b-wpg"/>
                             <constraint firstItem="hZ9-TR-5sf" firstAttribute="leading" secondItem="5rq-ka-Tbb" secondAttribute="leading" id="kvh-qC-Dxf"/>
                             <constraint firstItem="hZ9-TR-5sf" firstAttribute="top" secondItem="5rq-ka-Tbb" secondAttribute="top" id="vhg-cn-ajh"/>
                             <constraint firstItem="Oyk-wC-s6D" firstAttribute="top" secondItem="hZ9-TR-5sf" secondAttribute="bottom" id="xC2-Uj-IMN"/>
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="fakeCameraView" destination="hZ9-TR-5sf" id="Dkd-be-HY5"/>
+                        <outlet property="cameraView" destination="hZ9-TR-5sf" id="qub-Ta-Qcl"/>
+                        <outlet property="sceneView" destination="PJs-5b-Kuj" id="QLG-ez-5gs"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SZV-WD-TEh" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="103" y="145"/>
+            <point key="canvasLocation" x="101.59999999999999" y="144.3778110944528"/>
         </scene>
     </scenes>
 </document>

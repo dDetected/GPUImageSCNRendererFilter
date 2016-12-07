@@ -9,14 +9,20 @@
 #import "DMViewController.h"
 #import <Photos/Photos.h>
 #import <AssetsLibrary/AssetsLibrary.h>
+#import "GPUImageSCNRendererFilter.h"
 
 @interface DMViewController () <SCNSceneRendererDelegate, GPUImageVideoCameraDelegate>
 
-@property (weak, nonatomic) IBOutlet GPUImageView *fakeCameraView;
+@property (weak, nonatomic) IBOutlet GPUImageView *cameraView;
 @property (weak, nonatomic) IBOutlet SCNView *sceneView;
 
 @property (strong, nonatomic) GPUImageVideoCamera *camera;
+@property (strong, nonatomic) GPUImageAlphaBlendFilter *blender;
+@property (strong, nonatomic) GPUImageUIElement *element;
+
 @property (strong, nonatomic) NSURL *cameraVideoOuputURL;
+
+@property (strong, nonatomic) UIImageView *fake;
 
 @end
 
@@ -31,22 +37,44 @@
     self.camera.horizontallyMirrorRearFacingCamera = NO;
     self.camera.delegate = self;
     
-    [self.camera addTarget:self.fakeCameraView];
-    
-    SCNScene *scene = [SCNScene sceneNamed:@"Objects.scnassets/main.scn"];
-    scene.background.contents = self.fakeCameraView.layer;
-    
-    self.sceneView.scene = scene;
+    self.sceneView.scene = [SCNScene sceneNamed:@"Objects.scnassets/main.scn"];
     self.sceneView.allowsCameraControl = NO;
     self.sceneView.showsStatistics = YES;
-    self.sceneView.backgroundColor = [UIColor greenColor];
+    self.sceneView.backgroundColor = [UIColor clearColor];
     self.sceneView.delegate = self;
+    
+    GPUImageSepiaFilter *filter = [[GPUImageSepiaFilter alloc] init];
+    [self.camera addTarget:filter];
+    
+    self.blender = [[GPUImageAlphaBlendFilter alloc] init];
+    self.blender.mix = 1;
+    self.element = [[GPUImageUIElement alloc] initWithView:self.fake];
+    
+    [filter addTarget:self.blender];
+    [self.element addTarget:self.blender];
+    [self.blender addTarget:self.cameraView];
+    
+    __weak typeof(self) welf = self;
+    [filter setFrameProcessingCompletionBlock:^(GPUImageOutput *input, CMTime time) {
+        UIImageView *v = self.fake;
+        [welf.element setValue:v forKey:@"view"];
+        [welf.element setValue:v.layer forKey:@"layer"];
+        [welf.element update];
+    }];
+    
+    
+    SCNNode *n = [self.sceneView.scene.rootNode childNodeWithName:@"coin" recursively:YES];
+    [n runAction:[SCNAction repeatActionForever:[SCNAction rotateByX:0 y:10 z:0 duration:0.3]]];
     
     UIPanGestureRecognizer *tapGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
     NSMutableArray *gestureRecognizers = [NSMutableArray array];
     [gestureRecognizers addObject:tapGesture];
     [gestureRecognizers addObjectsFromArray:self.view.gestureRecognizers];
     self.view.gestureRecognizers = gestureRecognizers;
+}
+
+- (UIImageView *)fake {
+    return [[UIImageView alloc] initWithImage:self.sceneView.snapshot];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
