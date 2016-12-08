@@ -11,17 +11,34 @@
 
 @implementation GPUImageSCNRendererFilter
 
-- (id)initWithScene:(SCNScene *)scene context:(EAGLContext *)context {
+- (id)initWithScene:(SCNScene *)scene {
     if (self == [super initWithFragmentShaderFromString:kGPUImagePassthroughFragmentShaderString]) {
-        _renderer = [SCNRenderer rendererWithContext:context options:nil];
+        _renderer = [SCNRenderer rendererWithContext:[GPUImageContext sharedImageProcessingContext].context options:nil];
         _renderer.scene = scene;
     }
     return self;
 }
 
-- (void)newFrameReadyAtTime:(CMTime)frameTime atIndex:(NSInteger)textureIndex {
+- (void)renderToTextureWithVertices:(const GLfloat *)vertices textureCoordinates:(const GLfloat *)textureCoordinates {
+    if (self.preventRendering) {
+        [firstInputFramebuffer unlock];
+        return;
+    }
+    
+    outputFramebuffer = [[GPUImageContext sharedFramebufferCache] fetchFramebufferForSize:[self sizeOfFBO] textureOptions:self.outputTextureOptions onlyTexture:NO];
+    [outputFramebuffer activateFramebuffer];
+    
+    if (usingNextFrameForImageCapture) {
+        [outputFramebuffer lock];
+    }
+    
     [self.renderer render];
-    [super newFrameReadyAtTime:frameTime atIndex:textureIndex];
+    
+    [firstInputFramebuffer unlock];
+    
+    if (usingNextFrameForImageCapture) {
+        dispatch_semaphore_signal(imageCaptureSemaphore);
+    }
 }
 
 @end

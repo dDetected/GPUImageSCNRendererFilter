@@ -14,6 +14,6 @@
 
 @property (strong, nonatomic) SCNRenderer *renderer;
 
-- (instancetype)initWithScene:(SCNScene *)scene context:(EAGLContext *)context;
+- (instancetype)initWithScene:(SCNScene *)scene;
 
 @end

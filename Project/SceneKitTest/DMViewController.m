@@ -36,7 +36,7 @@
     self.camera.delegate = self;
     
     self.scene = [SCNScene sceneNamed:@"Objects.scnassets/main.scn"];
-    self.filter = [[GPUImageSCNRendererFilter alloc] initWithScene:self.scene context:[GPUImageContext sharedImageProcessingContext].context];
+    self.filter = [[GPUImageSCNRendererFilter alloc] initWithScene:self.scene];
     [self.camera addTarget:self.filter];
     [self.filter addTarget:self.cameraView];
     
@@ -125,6 +125,7 @@
         [node.physicsBody applyTorque:SCNVector4Make(0, 10000, 0, angle) impulse:YES];
     }
 }
+
 
 #pragma mark - GPUImageVideoCameraDelegate
 
