@@ -10,6 +10,7 @@
 #import <Photos/Photos.h>
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "GPUImageSCNRendererFilter.h"
+#import <CoreMotion/CoreMotion.h>
 
 @interface DMViewController () <GPUImageVideoCameraDelegate>
 
@@ -19,6 +20,11 @@
 @property (strong, nonatomic) GPUImageSCNRendererFilter *filter;
 @property (strong, nonatomic) GPUImageMovieWriter *writer;
 @property (strong, nonatomic) SCNScene *scene;
+
+@property (strong, nonatomic) CMMotionManager* motionManager;
+@property (strong, nonatomic) SCNNode* scnCamera;
+@property (strong, nonatomic) CMAttitude* initialAttitude;;
+
 
 @property (strong, nonatomic) NSURL *cameraVideoOuputURL;
 
@@ -49,6 +55,23 @@
     [gestures addObject:pan];
     [gestures addObjectsFromArray:self.view.gestureRecognizers];
     self.view.gestureRecognizers = gestures;
+    
+    self.motionManager = [[CMMotionManager alloc] init];
+    [self.motionManager setDeviceMotionUpdateInterval:0.033333];
+    self.scnCamera = [self.scene.rootNode childNodeWithName:@"camera" recursively:YES];
+    
+    [self.motionManager startDeviceMotionUpdatesToQueue:[NSOperationQueue mainQueue] withHandler:^(CMDeviceMotion * _Nullable motion, NSError * _Nullable error) {
+        if (self.initialAttitude == nil){
+            self.initialAttitude = motion.attitude;
+            return;
+        }
+        
+        CMQuaternion q =  motion.attitude.quaternion;
+//        [self.scnCamera setOrientation: SCNVector4Make(-q.x, -q.y, -q.z, -q.w)];
+        [self.scnCamera setOrientation: SCNVector4Make(-q.x, q.y, q.z, q.w)];
+        
+        //[self.scnCamera setEulerAngles:SCNVector3Make(pitch, roll, yaw)];
+    }];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
